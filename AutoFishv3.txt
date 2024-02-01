@@ -1,0 +1,21 @@
+#MaxThreadsPerHotKey, 2
+Toggle := 0
+ 
+F1::
+Toggle := !Toggle
+ 
+While (Toggle) {
+    Click
+    Sleep, 3000
+    Click
+    Sleep, 100
+    PixelSearch, tapX, tapY, 1499, 246, 1499, 872, 0x000000, 1, fast, RGB
+
+    If (tapX) {
+        While (tapX && Toggle) {
+            Click
+            Sleep, 10
+            PixelSearch, tapX, tapY, 1499, 246, 1499, 872, 0x000000, 1, fast, RGB
+        }
+    }
+}
