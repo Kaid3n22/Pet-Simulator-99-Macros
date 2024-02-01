@@ -1,0 +1,35 @@
+#MaxThreadsPerHotKey, 2
+Toggle := 0
+ 
+F1::
+Toggle := !Toggle
+LastUI := -400
+ 
+While (Toggle) {
+    If (A_TickCount - LastUI >= 400) {
+        Click
+        Sleep, 3000
+        Click
+        Sleep, 500
+        PixelSearch, whiteX, whiteY, 1499, 246, 1499, 872, 0xFFFFFF, 1, fast, RGB
+        PixelSearch, blackX, blackY, 1499, 246, 1499, 872, 0x000000, 1, fast, RGB
+        
+        If (whiteX && blackX) {
+            While (whiteX && blackX) {
+                Click
+                Sleep, 10
+                PixelSearch, whiteX, whiteY, 1499, 246, 1499, 872, 0xFFFFFF, 1, fast, RGB
+                PixelSearch, blackX, blackY, 1499, 246, 1499, 872, 0x000000, 1, fast, RGB
+            }
+            
+            LastUI := A_TickCount
+        }
+    } else {
+        Sleep, 10
+    }
+}
+
+return
+
+P::
+ExitApp
