@@ -1,0 +1,73 @@
+#MaxThreadsPerHotKey, 2
+Toggle := 0
+
+F1::
+Toggle := !Toggle
+MouseDown := False
+
+While Toggle {
+    PixelSearch, greyX, greyY, 1485, 255, 1512, 862, 0xE3CBC7, 5, fast ;;grey
+    PixelSearch, greenX, greenY, 1485, 255, 1512, 862, 0x12F88B, 5, fast ;;green
+
+    If (greenY or greyY) {
+        If (!greenY) {
+            MouseDown := !MouseDown
+            
+            if(MouseDown) {
+                Send {Click down}
+                x := 0
+                green := False
+                
+                Loop {
+                    Sleep, 50
+                    PixelSearch, greenX, greenY, 1485, 255, 1512, 862, 0x12F88B, 5, fast ;;green
+                    
+                    if(greenY) {
+                        green := True
+                    }
+                    
+                    x += 1
+                } Until (x >= 15 or green)
+
+            } else {
+                Send {Click up}
+                
+                x := 0
+                green := False
+                
+                Loop {
+                    Sleep, 50
+                    PixelSearch, greenX, greenY, 1485, 255, 1512, 862, 0x12F88B, 5, fast ;;green
+                    
+                    if(greenY) {
+                        green := True
+                    }
+                    x += 1
+                } Until (x >= 15 or green)
+            }
+        } else {
+	    ;MouseDown := !MouseDown
+            
+            green := True
+            
+            Loop {
+                Send {Click down}
+                Sleep, 100
+                Send {Click up}
+                Sleep, 50
+                PixelSearch, greenX, greenY, 1485, 255, 1512, 862, 0x12F88B, 5, fast ;;green
+                
+                if(not greenY) {
+                    green := False
+                }
+            } Until (not green)
+        }
+    } else {
+        MouseDown := False
+        Send {Click down}
+        Sleep, 100
+        Send {Click up}
+        Sleep, 3000
+        Send {Click down}
+    }
+}
