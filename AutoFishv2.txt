@@ -1,0 +1,41 @@
+#MaxThreadsPerHotKey, 2
+Toggle := 0
+
+F1::
+Toggle := !Toggle
+
+While Toggle {
+    PixelSearch, redX, redY, 1485, 255, 1511, 862, 0x5B0000, 5, fast RGB ;;red
+    PixelSearch, greyX, greyY, 1485, 255, 1511, 862, 0xE3CBC7, 1, fast ;;grey
+    PixelSearch, greenX, greenY, 1485, 255, 1511, 862, 0x12F88B, 5, fast ;;green
+    
+    if(redX or greenX or greyX) {
+        if(greyX) {
+            if(greyY > redY) {
+                Send {Click down}
+            } else {
+                Send {Click up}
+            }
+        } else {
+            green := True
+            
+            Loop {
+                Send {Click down}
+                Sleep, 125
+                Send {Click up}
+                Sleep, 50
+                PixelSearch, greenX, greenY, 1485, 255, 1511, 862, 0x12F88B, 5, fast ;;green
+                
+                if(not greenY) {
+                    green := False
+                }
+            } Until (not green)
+        }
+    } else {
+        Send {Click down}
+        Sleep, 100
+        Send {Click up}
+        Sleep, 3000
+        Send {Click down}
+    }
+}
