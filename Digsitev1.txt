@@ -1,0 +1,182 @@
+#MaxThreadsPerHotKey, 2
+Toggle := 0
+
+Shovel := 5
+
+;flimsy shovel = 1
+;sturdy shovel = 2
+;advanced shovel = 3
+;stone shovel = 4
+;iron shovel = 5
+;golden shovel = 6
+
+MaxDigColor := 0
+
+MiningBoxX1 := 316
+MiningBoxY1 := 201
+MiningBoxX2 := 1432
+MiningBoxY2 := 845
+
+GoToTopX1 := 874
+GoToTopY1 := 85
+GoToTopX2 := 1062
+GoToTopY2 := 146
+
+HomeX := 973
+HomeY := 569
+
+CharacterX := 958
+CharacterY := 595
+
+If(Shovel == 1) { ;flimsy shovel
+    MaxDigColor := 0x818FB6
+} Else If(Shovel == 2) { ;sturdy shovel
+    MaxDigColor := 0x554978
+} Else If(Shovel == 3) { ;advanced shovel
+    MaxDigColor := 0x37387F
+} Else If(Shovel == 4) { ;stone shovel
+    MaxDigColor := 0x380C0C
+} Else If(Shovel == 5) { ;iron shovel
+    MaxDigColor := 0x0B0F11
+} Else If(Shovel == 6) { ;golden shovel (not sure if there is a difference
+    MaxDigColor := 0x0B0F11
+}
+
+F1::
+Toggle := !Toggle
+Times := 0
+Started := 0
+
+While Toggle {
+    MouseMove, 500, 500
+    Send {RButton Down}
+    MouseMove, 500, 510, 50
+    Send {RButton Up}
+    
+    Send {W down}
+    Sleep, 500
+    Send {W up}
+    
+    If(Times == 64) {
+        Times := 0
+    }
+    
+    Row := Ceil(((Times)/8)+0.00001)-1
+    
+    Send {D down}
+    Sleep, 1950
+    Send {D up}
+
+    Send {W down}
+    Sleep, 2050
+    Send {W up}
+
+    Send {A down}
+    Sleep, 150
+    Send {A up}
+    
+    If(Row > 0) {
+        x := 0
+        Loop {
+            Send {W down}
+            Sleep, 442
+            Send {W up}
+            
+            If(Floor((x+1)/2) == (x+1)/2) {
+                Send {A down}
+                Sleep, 25
+                Send {A up}
+            }
+            x++
+        } Until (x == Row)
+    }
+
+    x := 0
+    
+    Loop {
+        Send {A down}
+        Sleep, 440
+        Send {A up}
+        
+        If (Floor((x+1)/4) == (x+1)/4) {
+            Send {S down}
+            Sleep, 50
+            Send {S up}
+        }
+        
+        x++
+    } Until (x == 8-((Times-(Row*8))))
+    
+    MouseMove, CharacterX, CharacterY
+    
+    Started := A_TickCount
+    
+    Loop {
+        PixelSearch, BOreX, BOreY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0x5A5FD6, 5, fast RGB ;Blue ore
+        PixelSearch, YOreX, YOreY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0xE1AA00, 5, fast RGB ;Yellow ore
+        PixelSearch, LBOreX, LBOreY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0x00CBFF, 5, fast RGB ;Light blue ore
+        PixelSearch, RChestX, RChestY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0xC50000, 5, fast RGB ;Red chest
+        PixelSearch, YChestX, YChestY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0xDBB800, 5, fast RGB ;Yellow chest
+        PixelSearch, PChestX, PChestY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0xFE00FF, 5, fast RGB ;Pink chest
+        PixelSearch, OChestX, OChestY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0xDF5800, 5, fast RGB ;Orange chest
+        PixelSearch, PGChestX, PGChestY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, 0x4414DD, 5, fast RGB ;Purple galaxy chest
+        
+        PixelSearch, MaxDigX, MaxDigY, MiningBoxX1, MiningBoxY1, MiningBoxX2, MiningBoxY2, MaxDigColor, 2, fast RGB ;Max Stone
+        
+        PixelSearch, GoToTopX, GoToTopY, GoToTopX1, GoToTopY1, GoToTopX2, GoToTopY2, 0xFF094A, 5, fast RGB ;Go to Top button
+        
+        If(!GoToTopX && A_TickCount - Started >= 4000) {
+            break ;digsite reset
+        }
+        
+        If(MaxDigX && Abs(MaxDigX - CharacterX) >= CharacterX/10 && Abs(MaxDigY - CharacterY) >= CharacterY/5) {
+            MouseMove, MaxDigX, MaxDigY
+            break
+        }
+        
+        If(BOreX) {
+            MouseMove, BOreX+1, BOreY+1
+        } Else If(YOreX) {
+            MouseMove, YOreX+1, YOreY+1
+        } Else If(LBOreX) {
+            MouseMove, LBOreX+1, LBOreY+1
+        } Else If(RChestX) {
+            MouseMove, RChestX+1, RChestY+1
+        } Else If(YChestX) {
+            MouseMove, YChestX+1, YChestY+1
+        } Else If(OChestX) {
+            MouseMove, OChestX+1, OChestY+1
+        } Else If(PChestX) {
+            MouseMove, PChestX+1, PChestY+1
+        } Else If(PGChestX) {
+            MouseMove, PGChestX+1, PGChestY+1
+        } Else {
+            MouseMove, CharacterX, CharacterY
+        }
+        
+        Send {Click down}
+        Sleep, 100
+        Send {Click up}
+        Sleep, 100
+    } Until (!Toggle)
+
+    Times := Times + 1
+    
+    MouseMove, HomeX, HomeY
+    Send {Click down}
+    Sleep, 100
+    Send {Click up}
+    
+    Sleep, 5000
+    
+    Send {S down}
+    Sleep, 1500
+    Send {S up}
+    
+    Sleep, 5000
+}
+
+return
+
+F2::
+ExitApp
